@@ -1,9 +1,10 @@
 const express = require('express');
+const twilio = require('twilio');
 const app = express();
 
 console.log('Webhook server is alive');
 
-app.use(express.urlencoded({ extended: true })); // Voor form-data van Twilio
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.post('/webhook', (req, res) => {
@@ -18,11 +19,14 @@ app.post('/webhook', (req, res) => {
     reply = "We zijn dagelijks open van 12:00 tot 22:00.";
   }
 
-  res.json({ reply });
+  const twiml = new twilio.twiml.MessagingResponse();
+  twiml.message(reply);
+
+  res.writeHead(200, { 'Content-Type': 'text/xml' });
+  res.end(twiml.toString());
 });
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Webhook server draait op poort ${port}`);
 });
-
