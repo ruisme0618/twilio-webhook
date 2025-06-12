@@ -1,14 +1,16 @@
 const express = require('express');
 const app = express();
 
-app.use(express.urlencoded({ extended: true })); // <-- form data (zoals Twilio stuurt)
+// 🟩 Nodig om form-data (zoals Twilio stuurt) correct te verwerken
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-
-
+// 🟩 Endpoint voor Twilio Studio HTTP Request
 app.post('/webhook', (req, res) => {
-  const message = (req.body.Body || '').toLowerCase();
+  // 🛠 Log binnenkomende data om te debuggen
+  console.log('✅ Ontvangen van Twilio:', req.body);
 
+  const message = (req.body.Body || '').toLowerCase();
   let reply = "Sorry, ik begrijp je niet.";
 
   if (message.includes('reserveren')) {
@@ -17,11 +19,12 @@ app.post('/webhook', (req, res) => {
     reply = "We zijn dagelijks open van 12:00 tot 22:00.";
   }
 
-  // Twilio verwacht vaak TwiML (XML), maar als je JSON wilt:
+  // 🟩 Antwoord in JSON-formaat voor Twilio Studio
   res.json({ reply });
 });
 
-const port = process.env.PORT || 3000;
+// 🟩 Zorg dat de server draait op de juiste poort
+const port = process.env.PORT || 10000;
 app.listen(port, () => {
-  console.log(`Webhook server draait op poort ${port}`);
+  console.log(`🚀 Webhook server draait op poort ${port}`);
 });
