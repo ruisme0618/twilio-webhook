@@ -1,8 +1,9 @@
 const express = require('express');
 const app = express();
 
-app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // <-- form data (zoals Twilio stuurt)
+app.use(express.json());
+
 
 
 app.post('/webhook', (req, res) => {
