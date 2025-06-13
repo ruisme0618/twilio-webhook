@@ -1,20 +1,25 @@
 const express = require('express');
+const twilio = require('twilio');
 const app = express();
 
 console.log('Webhook server is alive');
 
-app.use(express.urlencoded({ extended: true })); // Voor form-data van Twilio
+app.use(express.urlencoded({ extended: true })); // Parse x-www-form-urlencoded van Twilio
 
 app.post('/webhook', (req, res) => {
+  // Debug logging van de body, kan object zijn of string
   console.log('✅ Ontvangen van Twilio:', req.body);
 
   let message = '';
 
-  if (req.body.Body) {
+  if (typeof req.body === 'object' && req.body.Body) {
     message = req.body.Body.toLowerCase();
-  } else if (req.body.body) {
-    const params = new URLSearchParams(req.body.body);
-    message = (params.get('Body') || '').toLowerCase();
+  } else if (typeof req.body === 'string') {
+    // fallback: probeer Body eruit te halen als raw string (optioneel)
+    const match = req.body.match(/Body=(.*)/);
+    if (match) {
+      message = decodeURIComponent(match[1]).toLowerCase();
+    }
   }
 
   let reply = "Sorry, ik begrijp je niet.";
@@ -25,7 +30,11 @@ app.post('/webhook', (req, res) => {
     reply = "We zijn dagelijks open van 12:00 tot 22:00.";
   }
 
-  res.json({ reply });
+  const twiml = new twilio.twiml.MessagingResponse();
+  twiml.message(reply);
+
+  res.type('text/xml');
+  res.send(twiml.toString());
 });
 
 const port = process.env.PORT || 3000;
