@@ -18,7 +18,7 @@ app.post('/webhook', (req, res) => {
     reply = "We zijn dagelijks open van 12:00 tot 22:00.";
   }
 
-  // ➤ Hier komt de TwiML response in plaats van JSON
+  // ➤ Verstuur TwiML-response naar Twilio
   const twiml = new twilio.twiml.MessagingResponse();
   twiml.message(reply);
   res.type('text/xml');
@@ -29,4 +29,3 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Webhook server draait op poort ${port}`);
 });
-
