@@ -1,13 +1,22 @@
 const express = require('express');
 const app = express();
 
-app.use(express.urlencoded({ extended: true }));  // Voor Twilio form data
-app.use(express.json());
+console.log('Webhook server is alive');
+
+app.use(express.urlencoded({ extended: true })); // Voor form-data van Twilio
 
 app.post('/webhook', (req, res) => {
   console.log('✅ Ontvangen van Twilio:', req.body);
 
-  const message = (req.body.Body || '').toLowerCase();
+  let message = '';
+
+  if (req.body.Body) {
+    message = req.body.Body.toLowerCase();
+  } else if (req.body.body) {
+    const params = new URLSearchParams(req.body.body);
+    message = (params.get('Body') || '').toLowerCase();
+  }
+
   let reply = "Sorry, ik begrijp je niet.";
 
   if (message.includes('reserveren')) {
@@ -16,7 +25,6 @@ app.post('/webhook', (req, res) => {
     reply = "We zijn dagelijks open van 12:00 tot 22:00.";
   }
 
-  // Belangrijk: geef een JSON response terug met 'reply'
   res.json({ reply });
 });
 
