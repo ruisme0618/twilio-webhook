@@ -1,7 +1,8 @@
 const express = require('express');
 const app = express();
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));  // Voor Twilio form data
+app.use(express.json());
 
 app.post('/webhook', (req, res) => {
   console.log('✅ Ontvangen van Twilio:', req.body);
@@ -15,6 +16,7 @@ app.post('/webhook', (req, res) => {
     reply = "We zijn dagelijks open van 12:00 tot 22:00.";
   }
 
+  // Belangrijk: geef een JSON response terug met 'reply'
   res.json({ reply });
 });
 
